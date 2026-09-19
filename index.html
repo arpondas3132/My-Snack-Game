@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Worms Zone Ultimate Master Edition</title>
+    <title>Worms Zone Ultimate Joystick Edition</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             user-select: none;
+            -webkit-user-select: none;
         }
 
         body {
@@ -17,6 +18,7 @@
             background-color: #0f172a;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #fff;
+            touch-action: none;
         }
 
         #gameCanvas {
@@ -37,294 +39,149 @@
         }
 
         .lobby-title {
-            font-size: 38px;
+            font-size: 34px;
             font-weight: 800;
             color: #facc15;
             text-shadow: 0 0 20px rgba(250, 204, 21, 0.5);
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             text-transform: uppercase;
         }
 
         .lobby-box {
-            background: rgba(30, 41, 59, 0.9);
+            background: rgba(30, 41, 59, 0.95);
             border: 2px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            padding: 20px;
+            padding: 18px;
             border-radius: 20px;
             width: 100%;
-            max-width: 480px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            max-width: 450px;
             display: flex;
             flex-direction: column;
             gap: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
 
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .input-group label {
-            font-size: 13px;
-            color: #94a3b8;
-            font-weight: bold;
-        }
-
+        .input-group { display: flex; flex-direction: column; gap: 4px; }
+        .input-group label { font-size: 12px; color: #94a3b8; font-weight: bold; }
         .input-group input {
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid #334155;
-            background: #0f172a;
-            color: #fff;
-            font-size: 15px;
-            outline: none;
+            padding: 8px; border-radius: 8px; border: 1px solid #334155;
+            background: #0f172a; color: #fff; font-size: 14px; outline: none;
         }
 
         .coins-display {
-            font-size: 18px;
-            color: #facc15;
-            font-weight: bold;
-            text-align: center;
-            background: rgba(250, 204, 21, 0.1);
-            padding: 8px;
-            border-radius: 10px;
+            font-size: 16px; color: #facc15; font-weight: bold; text-align: center;
+            background: rgba(250, 204, 21, 0.1); padding: 8px; border-radius: 10px;
             border: 1px solid rgba(250, 204, 21, 0.3);
         }
 
-        /* Tabs for Shops */
-        .shop-tabs {
-            display: flex;
-            gap: 10px;
-            border-bottom: 1px solid #334155;
-            padding-bottom: 5px;
-        }
+        .shop-tabs { display: flex; gap: 10px; border-bottom: 1px solid #334155; padding-bottom: 5px; }
+        .tab-btn { background: none; border: none; color: #94a3b8; font-weight: bold; cursor: pointer; padding: 5px 10px; font-size: 12px; }
+        .tab-btn.active { color: #facc15; border-bottom: 2px solid #facc15; }
 
-        .tab-btn {
-            background: none;
-            border: none;
-            color: #94a3b8;
-            font-weight: bold;
-            cursor: pointer;
-            padding: 5px 10px;
-            font-size: 13px;
-        }
-
-        .tab-btn.active {
-            color: #facc15;
-            border-bottom: 2px solid #facc15;
-        }
-
-        /* Skin/Item Selector Grid */
-        .item-selector {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 5px 0;
-        }
-
+        .item-selector { display: flex; gap: 10px; overflow-x: auto; padding: 5px 0; }
         .item-card {
-            min-width: 90px;
-            padding: 10px;
-            background: #0f172a;
-            border: 2px solid #334155;
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.2s;
+            min-width: 85px; padding: 8px; background: #0f172a;
+            border: 2px solid #334155; border-radius: 10px; text-align: center; cursor: pointer;
         }
-
-        .item-card.selected {
-            border-color: #facc15;
-            background: rgba(250, 204, 21, 0.1);
-        }
-
-        .skin-preview {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            margin: 0 auto 5px;
-        }
-
-        .item-price {
-            font-size: 11px;
-            color: #facc15;
-            margin-top: 2px;
-        }
-
-        /* Chat Section */
-        .chat-box {
-            height: 70px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 10px;
-            padding: 8px;
-            overflow-y: auto;
-            font-size: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .chat-input-container {
-            display: flex;
-            gap: 6px;
-        }
-
-        .chat-input-container input {
-            flex: 1;
-            padding: 6px 10px;
-            border-radius: 8px;
-            border: 1px solid #334155;
-            background: #0f172a;
-            color: #fff;
-            font-size: 12px;
-        }
-
-        .chat-input-container button {
-            padding: 6px 12px;
-            background: #3b82f6;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 12px;
-        }
+        .item-card.selected { border-color: #facc15; background: rgba(250, 204, 21, 0.1); }
+        .skin-preview { width: 26px; height: 26px; border-radius: 50%; margin: 0 auto 4px; }
+        .item-price { font-size: 11px; color: #facc15; margin-top: 2px; }
 
         .btn-start {
-            padding: 12px;
-            background: #22c55e;
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 5px 15px rgba(34, 197, 94, 0.4);
-            margin-top: 5px;
+            padding: 12px; background: #22c55e; color: #fff; border: none;
+            border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); margin-top: 5px;
         }
 
-        .btn-start:hover { background: #16a34a; }
-
-        /* ----- IN-GAME UI ----- */
+        /* ----- IN-GAME HUD ----- */
         #ui-overlay {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 10;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(10px);
-            padding: 12px 20px;
-            border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            pointer-events: none;
+            position: absolute; top: 12px; left: 12px; z-index: 10;
+            background: rgba(15, 23, 42, 0.85); padding: 8px 16px; border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2); pointer-events: none;
         }
-
-        .score-box { font-size: 20px; font-weight: bold; color: #4ade80; }
-        .coin-box { font-size: 15px; color: #facc15; font-weight: bold; margin-top: 2px; }
+        .score-box { font-size: 18px; font-weight: bold; color: #4ade80; }
+        .coin-box { font-size: 14px; color: #facc15; font-weight: bold; }
 
         #leaderboard {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 10;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(10px);
-            padding: 12px 16px;
-            border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            width: 180px;
+            position: absolute; top: 12px; right: 12px; z-index: 10;
+            background: rgba(15, 23, 42, 0.85); padding: 10px 14px; border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2); width: 160px; pointer-events: none;
         }
-
-        #leaderboard h3 { font-size: 13px; color: #facc15; margin-bottom: 6px; }
-        .lb-item { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; }
+        #leaderboard h3 { font-size: 12px; color: #facc15; margin-bottom: 6px; text-transform: uppercase; }
+        .lb-item { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px; }
         .lb-item.player { color: #4ade80; font-weight: bold; }
 
-        #game-over {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 20;
-            background: rgba(15, 23, 42, 0.95);
-            padding: 30px 50px;
-            border-radius: 20px;
-            border: 2px solid #ef4444;
-            text-align: center;
+        /* 🕹️ TOUCH JOYSTICK CONTROLS */
+        #joystick-zone {
+            position: absolute; bottom: 25px; left: 25px; width: 120px; height: 120px;
+            background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%; z-index: 20; backdrop-filter: blur(4px); touch-action: none;
+        }
+        #joystick-knob {
+            position: absolute; top: 35px; left: 35px; width: 50px; height: 50px;
+            background: rgba(250, 204, 21, 0.8); border: 2px solid #fff;
+            border-radius: 50%; box-shadow: 0 0 10px rgba(0,0,0,0.5); pointer-events: none;
         }
 
-        #restart-btn {
-            margin-top: 15px;
-            padding: 10px 25px;
-            font-size: 16px;
-            background: #22c55e;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
+        #boost-btn {
+            position: absolute; bottom: 35px; right: 35px; width: 75px; height: 75px;
+            background: rgba(239, 68, 68, 0.6); border: 3px solid #ef4444;
+            border-radius: 50%; color: #fff; font-size: 13px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center; z-index: 20;
+            backdrop-filter: blur(4px); touch-action: none;
+        }
+
+        #game-over {
+            display: none; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); z-index: 30; background: rgba(15, 23, 42, 0.95);
+            padding: 25px 40px; border-radius: 18px; border: 2px solid #ef4444; text-align: center;
         }
     </style>
 </head>
 <body>
 
-    <!-- 🚪 WAITING LOBBY -->
+    <!-- 🚪 LOBBY -->
     <div id="lobby">
         <div class="lobby-title">🐍 Worms Zone</div>
         <div class="lobby-box">
-            <div class="coins-display">🪙 Total Coins: <span id="lobbyCoinCount">0</span></div>
+            <div class="coins-display">🪙 Total Coins: <span id="lobbyCoinCount">67</span></div>
             
             <div class="input-group">
                 <label>Player Name:</label>
                 <input type="text" id="playerName" value="Player1" maxlength="12">
             </div>
 
-            <!-- Shop Tabs -->
             <div class="shop-tabs">
                 <button class="tab-btn active" onclick="switchTab('skins')">Skins</button>
                 <button class="tab-btn" onclick="switchTab('masks')">Nose / Masks</button>
             </div>
 
-            <!-- Skin / Mask Grid -->
             <div class="item-selector" id="shopContainer"></div>
-
-            <!-- Lobby Chat -->
-            <div class="input-group">
-                <label>Global Chat:</label>
-                <div class="chat-box" id="chatBox">
-                    <div><b style="color:#38bdf8;">System:</b> Welcome! Customise your snake snout/mask and play!</div>
-                </div>
-                <div class="chat-input-container">
-                    <input type="text" id="chatInput" placeholder="Type a message...">
-                    <button onclick="sendChatMessage()">Send</button>
-                </div>
-            </div>
 
             <button class="btn-start" onclick="startGame()">START GAME</button>
         </div>
     </div>
 
-    <!-- 🎮 IN-GAME HUD -->
+    <!-- 🎮 HUD & CONTROLS -->
     <div id="ui-overlay">
         <div class="score-box">Score: <span id="scoreVal">0</span></div>
-        <div class="coin-box">🪙 Coins: <span id="gameCoinVal">0</span></div>
-        <div style="font-size:11px; color:#94a3b8; margin-top:3px;">Left Click / Tap to Boost</div>
+        <div class="coin-box">🪙 Coins: <span id="gameCoinVal">67</span></div>
     </div>
 
     <div id="leaderboard">
-        <h3>🏆 Top Worms</h3>
+        <h3>🏆 Scoreboard</h3>
         <div id="lb-list"></div>
     </div>
 
+    <!-- Joystick and Boost Controls -->
+    <div id="joystick-zone"><div id="joystick-knob"></div></div>
+    <div id="boost-btn">BOOST</div>
+
     <div id="game-over">
-        <h2 style="color:#ef4444;">💥 Game Over!</h2>
-        <p id="deathReason" style="font-size: 14px; color: #cbd5e1; margin-top: 5px;"></p>
-        <p style="margin-top: 10px;">Final Score: <span id="finalScore">0</span></p>
-        <button id="restart-btn" onclick="location.reload()">Back to Lobby</button>
+        <h2 style="color:#ef4444; font-size: 26px;">💥 Game Over!</h2>
+        <p id="deathReason" style="font-size: 13px; color: #cbd5e1; margin-top: 6px;"></p>
+        <p style="margin-top: 10px; font-weight:bold;">Final Score: <span id="finalScore">0</span></p>
+        <button onclick="location.reload()" style="margin-top: 15px; padding: 10px 22px; background:#22c55e; color:#fff; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">Play Again</button>
     </div>
 
     <canvas id="gameCanvas"></canvas>
@@ -340,26 +197,23 @@
         const MAX_FOOD_COUNT = 300;
         const MAX_COIN_COUNT = 35;
 
-        // কয়েন ডাটা
-        let totalCoins = parseInt(localStorage.getItem('wz_coins_v2')) || 0;
+        // 🪙 ওল্ড পয়েন্ট/কয়েন ৬৭ সেট করা
+        let totalCoins = parseInt(localStorage.getItem('wz_coins_v4')) || 67;
         document.getElementById('lobbyCoinCount').innerText = totalCoins;
 
-        // সাপের স্কিন
         const SKINS = [
             { id: 'red', name: 'Ruby', color: '#e11d48', price: 0, unlocked: true },
-            { id: 'blue', name: 'Cyan', color: '#06b6d4', price: 40, unlocked: false },
-            { id: 'green', name: 'Emerald', color: '#10b981', price: 80, unlocked: false },
-            { id: 'purple', name: 'Royal', color: '#8b5cf6', price: 120, unlocked: false },
-            { id: 'gold', name: 'Gold', color: '#facc15', price: 200, unlocked: false }
+            { id: 'blue', name: 'Cyan', color: '#06b6d4', price: 20, unlocked: false },
+            { id: 'green', name: 'Emerald', color: '#10b981', price: 40, unlocked: false },
+            { id: 'purple', name: 'Royal', color: '#8b5cf6', price: 50, unlocked: false },
+            { id: 'gold', name: 'Gold', color: '#facc15', price: 65, unlocked: false }
         ];
 
-        // সাপের নাক/মুখোশ (Masks / Snouts)
         const MASKS = [
-            { id: 'none', name: 'Normal', price: 0, unlocked: true, type: 'none' },
-            { id: 'pig', name: 'Pig Nose 🐷', price: 30, unlocked: false, type: 'pig' },
-            { id: 'ninja', name: 'Ninja Mask 🥷', price: 60, unlocked: false, type: 'ninja' },
-            { id: 'crown', name: 'Crown 👑', price: 100, unlocked: false, type: 'crown' },
-            { id: 'horn', name: 'Gold Horn 🦄', price: 150, unlocked: false, type: 'horn' }
+            { id: 'none', name: 'Normal', price: 0, unlocked: true },
+            { id: 'pig', name: 'Pig 🐷', price: 25, unlocked: false },
+            { id: 'ninja', name: 'Ninja 🥷', price: 45, unlocked: false },
+            { id: 'crown', name: 'Crown 👑', price: 60, unlocked: false }
         ];
 
         let selectedSkin = SKINS[0];
@@ -377,7 +231,6 @@
         function renderShop() {
             const container = document.getElementById('shopContainer');
             container.innerHTML = '';
-
             const list = currentTab === 'skins' ? SKINS : MASKS;
 
             list.forEach(item => {
@@ -386,124 +239,101 @@
 
                 const card = document.createElement('div');
                 card.className = `item-card ${isSelected ? 'selected' : ''}`;
-                
-                let previewHTML = '';
-                if(currentTab === 'skins') {
-                    previewHTML = `<div class="skin-preview" style="background: ${item.color}"></div>`;
-                } else {
-                    previewHTML = `<div style="font-size:22px; margin-bottom:2px;">${item.name.split(' ')[1] || '🐍'}</div>`;
-                }
-
                 card.innerHTML = `
-                    ${previewHTML}
-                    <div style="font-weight:bold; font-size:12px;">${item.name.split(' ')[0]}</div>
+                    <div style="font-weight:bold; font-size:11px;">${item.name}</div>
                     <div class="item-price">${item.unlocked ? 'Owned' : '🪙 ' + item.price}</div>
                 `;
-                card.onclick = () => selectOrBuyItem(item, currentTab);
+                card.onclick = () => {
+                    if (item.unlocked) {
+                        if (currentTab === 'skins') selectedSkin = item;
+                        else selectedMask = item;
+                    } else if (totalCoins >= item.price) {
+                        totalCoins -= item.price;
+                        item.unlocked = true;
+                        if (currentTab === 'skins') selectedSkin = item;
+                        else selectedMask = item;
+                        localStorage.setItem('wz_coins_v4', totalCoins);
+                        document.getElementById('lobbyCoinCount').innerText = totalCoins;
+                    } else {
+                        alert('পর্যাপ্ত কয়েন নেই!');
+                    }
+                    renderShop();
+                };
                 container.appendChild(card);
             });
         }
-
-        function selectOrBuyItem(item, type) {
-            if (item.unlocked) {
-                if (type === 'skins') selectedSkin = item;
-                else selectedMask = item;
-            } else if (totalCoins >= item.price) {
-                totalCoins -= item.price;
-                item.unlocked = true;
-                if (type === 'skins') selectedSkin = item;
-                else selectedMask = item;
-                localStorage.setItem('wz_coins_v2', totalCoins);
-                document.getElementById('lobbyCoinCount').innerText = totalCoins;
-            } else {
-                alert('আপনার কাছে যথেষ্ট কয়েন নেই!');
-            }
-            renderShop();
-        }
-
         renderShop();
 
-        // লবি চ্যাট
-        function sendChatMessage() {
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            const pName = document.getElementById('playerName').value || 'Player';
-            if (text) {
-                const chatBox = document.getElementById('chatBox');
-                const msg = document.createElement('div');
-                msg.innerHTML = `<b style="color:#4ade80;">${pName}:</b> ${text}`;
-                chatBox.appendChild(msg);
-                chatBox.scrollTop = chatBox.scrollHeight;
-                input.value = '';
-            }
+        // 🕹️ Joystick Logics
+        const joyZone = document.getElementById('joystick-zone');
+        const joyKnob = document.getElementById('joystick-knob');
+        let moveAngle = null;
+        let isBoosting = false;
+
+        function handleJoystickMove(clientX, clientY) {
+            const rect = joyZone.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            const dx = clientX - centerX;
+            const dy = clientY - centerY;
+            const distance = Math.min(Math.hypot(dx, dy), 40);
+
+            moveAngle = Math.atan2(dy, dx);
+            const knobX = Math.cos(moveAngle) * distance + 35;
+            const knobY = Math.sin(moveAngle) * distance + 35;
+
+            joyKnob.style.left = knobX + 'px';
+            joyKnob.style.top = knobY + 'px';
         }
 
-        let mouseWorld = { x: MAP_SIZE / 2, y: MAP_SIZE / 2 };
-        let isMouseDown = false;
-        let isGameOver = false;
+        function resetJoystick() {
+            moveAngle = null;
+            joyKnob.style.left = '35px';
+            joyKnob.style.top = '35px';
+        }
 
-        window.addEventListener('mousemove', (e) => {
-            if (!playerWorm) return;
-            const cameraX = playerWorm.x - canvas.width / 2;
-            const cameraY = playerWorm.y - canvas.height / 2;
-            mouseWorld.x = e.clientX + cameraX;
-            mouseWorld.y = e.clientY + cameraY;
-        });
+        joyZone.addEventListener('touchstart', (e) => handleJoystickMove(e.touches[0].clientX, e.touches[0].clientY));
+        joyZone.addEventListener('touchmove', (e) => handleJoystickMove(e.touches[0].clientX, e.touches[0].clientY));
+        joyZone.addEventListener('touchend', resetJoystick);
 
-        // 🖱️ মাউসের বাম বাটন চেপে ধরলে স্পিড বাড়বে
-        window.addEventListener('mousedown', (e) => { if (e.button === 0) isMouseDown = true; });
-        window.addEventListener('mouseup', (e) => { if (e.button === 0) isMouseDown = false; });
+        // Mouse Fallback for PC Joystick
+        let isMouseJoy = false;
+        joyZone.addEventListener('mousedown', (e) => { isMouseJoy = true; handleJoystickMove(e.clientX, e.clientY); });
+        window.addEventListener('mousemove', (e) => { if (isMouseJoy) handleJoystickMove(e.clientX, e.clientY); });
+        window.addEventListener('mouseup', () => { isMouseJoy = false; resetJoystick(); });
 
-        // মোবাইল টাচ কন্ট্রোল
-        window.addEventListener('touchstart', () => { isMouseDown = true; });
-        window.addEventListener('touchend', () => { isMouseDown = false; });
-        window.addEventListener('touchmove', (e) => {
-            if (!playerWorm || !e.touches[0]) return;
-            const cameraX = playerWorm.x - canvas.width / 2;
-            const cameraY = playerWorm.y - canvas.height / 2;
-            mouseWorld.x = e.touches[0].clientX + cameraX;
-            mouseWorld.y = e.touches[0].clientY + cameraY;
-        });
-
-        const FRUIT_TYPES = [
-            { name: 'Apple', color: '#ef4444', radius: 8, score: 5 },
-            { name: 'Orange', color: '#f97316', radius: 9, score: 7 },
-            { name: 'Grape', color: '#a855f7', radius: 7, score: 4 }
-        ];
+        const boostBtn = document.getElementById('boost-btn');
+        boostBtn.addEventListener('touchstart', (e) => { e.preventDefault(); isBoosting = true; });
+        boostBtn.addEventListener('touchend', (e) => { e.preventDefault(); isBoosting = false; });
+        boostBtn.addEventListener('mousedown', () => isBoosting = true);
+        boostBtn.addEventListener('mouseup', () => isBoosting = false);
 
         class Food {
-            constructor(x, y) {
-                this.x = x || Math.random() * (MAP_SIZE - 400) + 200;
-                this.y = y || Math.random() * (MAP_SIZE - 400) + 200;
-                this.type = FRUIT_TYPES[Math.floor(Math.random() * FRUIT_TYPES.length)];
+            constructor(x, y, value = 5) {
+                this.x = x || Math.random() * (MAP_SIZE - 200) + 100;
+                this.y = y || Math.random() * (MAP_SIZE - 200) + 100;
+                this.radius = Math.min(12, 6 + value / 3);
+                this.value = value;
+                this.color = ['#ef4444', '#f97316', '#a855f7', '#38bdf8', '#4ade80'][Math.floor(Math.random() * 5)];
             }
-
-            draw(cameraX, cameraY) {
-                const screenX = this.x - cameraX;
-                const screenY = this.y - cameraY;
-                if (screenX < -20 || screenX > canvas.width + 20 || screenY < -20 || screenY > canvas.height + 20) return;
-
+            draw(camX, camY) {
                 ctx.beginPath();
-                ctx.arc(screenX, screenY, this.type.radius, 0, Math.PI * 2);
-                ctx.fillStyle = this.type.color;
+                ctx.arc(this.x - camX, this.y - camY, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
                 ctx.fill();
             }
         }
 
         class Coin {
             constructor() {
-                this.x = Math.random() * (MAP_SIZE - 400) + 200;
-                this.y = Math.random() * (MAP_SIZE - 400) + 200;
+                this.x = Math.random() * (MAP_SIZE - 200) + 100;
+                this.y = Math.random() * (MAP_SIZE - 200) + 100;
                 this.radius = 8;
             }
-
-            draw(cameraX, cameraY) {
-                const screenX = this.x - cameraX;
-                const screenY = this.y - cameraY;
-                if (screenX < -20 || screenX > canvas.width + 20 || screenY < -20 || screenY > canvas.height + 20) return;
-
+            draw(camX, camY) {
                 ctx.beginPath();
-                ctx.arc(screenX, screenY, this.radius, 0, Math.PI * 2);
+                ctx.arc(this.x - camX, this.y - camY, this.radius, 0, Math.PI * 2);
                 ctx.fillStyle = '#facc15';
                 ctx.fill();
                 ctx.strokeStyle = '#ca8a04';
@@ -512,158 +342,97 @@
             }
         }
 
-        class Segment {
-            constructor(x, y) { this.x = x; this.y = y; }
-        }
-
         class Worm {
-            constructor(id, name, x, y, color, maskType = 'none', isBot = false) {
+            constructor(id, name, x, y, color, mask, isBot = false) {
                 this.id = id;
                 this.name = name;
-                this.x = x;
-                this.y = y;
-                this.radius = 12; // প্রাথমিক সাইজ
+                this.x = x; this.y = y;
                 this.color = color;
-                this.maskType = maskType;
+                this.mask = mask;
                 this.isBot = isBot;
-                this.baseSpeed = 3.0;
-                this.speed = this.baseSpeed;
-                this.segments = [];
-                this.length = 20; // প্রাথমিক দৈর্ঘ্য
+                this.radius = 12;
+                this.speed = 3;
                 this.angle = Math.random() * Math.PI * 2;
                 this.score = 0;
+                this.segments = [];
+                this.length = 18;
                 this.isDead = false;
-                this.tongueTimer = 0;
 
-                for (let i = 0; i < this.length; i++) {
-                    this.segments.push(new Segment(this.x, this.y));
-                }
+                for (let i = 0; i < this.length; i++) this.segments.push({ x, y });
             }
 
-            update(targetX, targetY, isBoosting) {
+            update(targetAngle, boosting) {
                 if (this.isDead) return;
+                this.speed = boosting ? 5.2 : 3;
 
-                // স্পিড পরিবর্তন
-                this.speed = isBoosting ? this.baseSpeed * 1.8 : this.baseSpeed;
-
-                const dx = targetX - this.x;
-                const dy = targetY - this.y;
-                const targetAngle = Math.atan2(dy, dx);
-
-                let diff = targetAngle - this.angle;
-                while (diff < -Math.PI) diff += Math.PI * 2;
-                while (diff > Math.PI) diff -= Math.PI * 2;
-                this.angle += diff * 0.1;
+                if (targetAngle !== null) {
+                    let diff = targetAngle - this.angle;
+                    while (diff < -Math.PI) diff += Math.PI * 2;
+                    while (diff > Math.PI) diff -= Math.PI * 2;
+                    this.angle += diff * 0.12;
+                }
 
                 this.x += Math.cos(this.angle) * this.speed;
                 this.y += Math.sin(this.angle) * this.speed;
 
-                // 🛑 লাল সীমানা ধাক্কায় মৃত্যু
-                if (this.x <= 50 || this.x >= MAP_SIZE - 50 || this.y <= 50 || this.y >= MAP_SIZE - 50) {
+                // Border die
+                if (this.x <= 40 || this.x >= MAP_SIZE - 40 || this.y <= 40 || this.y >= MAP_SIZE - 40) {
                     this.die();
-                    return;
                 }
 
-                this.segments.unshift(new Segment(this.x, this.y));
-                while (this.segments.length > this.length) {
-                    this.segments.pop();
-                }
+                this.segments.unshift({ x: this.x, y: this.y });
+                while (this.segments.length > this.length) this.segments.pop();
 
-                // 📈 খুব আস্তে আস্তে মোটা হওয়া (Slow Growth Math)
-                this.radius = 12 + Math.min(25, this.score / 250); 
-                this.tongueTimer += 0.1;
+                // 📈 ধীর ও বাস্তবসম্মত বৃদ্ধি (Slow Growth)
+                this.radius = 12 + Math.min(22, this.score / 250);
             }
 
-            draw(cameraX, cameraY) {
+            draw(camX, camY) {
                 if (this.isDead) return;
 
-                // শরীরের অংশ আঁকা
                 for (let i = this.segments.length - 1; i >= 1; i -= 2) {
                     const seg = this.segments[i];
-                    const screenX = seg.x - cameraX;
-                    const screenY = seg.y - cameraY;
-                    if (screenX < -50 || screenX > canvas.width + 50 || screenY < -50 || screenY > canvas.height + 50) continue;
-
                     ctx.beginPath();
-                    ctx.arc(screenX, screenY, this.radius, 0, Math.PI * 2);
+                    ctx.arc(seg.x - camX, seg.y - camY, this.radius, 0, Math.PI * 2);
                     ctx.fillStyle = this.color;
                     ctx.fill();
                 }
 
-                // 🐍 মাথা, চোখ ও মুখ আঁকা (Head Details)
-                const headX = this.x - cameraX;
-                const headY = this.y - cameraY;
-
+                // Head
+                const hX = this.x - camX;
+                const hY = this.y - camY;
                 ctx.save();
-                ctx.translate(headX, headY);
+                ctx.translate(hX, hY);
                 ctx.rotate(this.angle);
 
-                // মাথা (Head Circle)
                 ctx.beginPath();
                 ctx.arc(0, 0, this.radius + 1, 0, Math.PI * 2);
                 ctx.fillStyle = this.color;
                 ctx.fill();
 
-                // 👅 লাল জিব (Tongue)
-                const tongueLen = 8 + Math.sin(this.tongueTimer) * 4;
+                // Eyes
                 ctx.beginPath();
-                ctx.moveTo(this.radius, -2);
-                ctx.lineTo(this.radius + tongueLen, -2);
-                ctx.lineTo(this.radius + tongueLen + 3, -5);
-                ctx.moveTo(this.radius + tongueLen, -2);
-                ctx.lineTo(this.radius + tongueLen + 3, 1);
-                ctx.strokeStyle = '#ef4444';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                // 👀 দুটি চোখ (Eyes)
-                const eyeOffset = this.radius * 0.5;
-                ctx.beginPath();
-                ctx.arc(this.radius * 0.3, -eyeOffset, 4, 0, Math.PI * 2);
-                ctx.arc(this.radius * 0.3, eyeOffset, 4, 0, Math.PI * 2);
-                ctx.fillStyle = '#ffffff';
+                ctx.arc(this.radius * 0.3, -5, 3.5, 0, Math.PI * 2);
+                ctx.arc(this.radius * 0.3, 5, 3.5, 0, Math.PI * 2);
+                ctx.fillStyle = '#fff';
                 ctx.fill();
 
-                // চোখের মনি (Pupils)
                 ctx.beginPath();
-                ctx.arc(this.radius * 0.4, -eyeOffset, 2, 0, Math.PI * 2);
-                ctx.arc(this.radius * 0.4, eyeOffset, 2, 0, Math.PI * 2);
-                ctx.fillStyle = '#000000';
+                ctx.arc(this.radius * 0.4, -5, 1.8, 0, Math.PI * 2);
+                ctx.arc(this.radius * 0.4, 5, 1.8, 0, Math.PI * 2);
+                ctx.fillStyle = '#000';
                 ctx.fill();
-
-                // 👺 কাস্টম নাক / মাস্ক (Custom Mask/Nose Overlay)
-                if (this.maskType === 'pig') {
-                    ctx.beginPath();
-                    ctx.arc(this.radius + 2, 0, 5, 0, Math.PI * 2);
-                    ctx.fillStyle = '#f472b6';
-                    ctx.fill();
-                } else if (this.maskType === 'ninja') {
-                    ctx.fillStyle = '#0f172a';
-                    ctx.fillRect(-2, -eyeOffset - 3, 10, (eyeOffset * 2) + 6);
-                } else if (this.maskType === 'crown') {
-                    ctx.fillStyle = '#facc15';
-                    ctx.beginPath();
-                    ctx.moveTo(-5, -this.radius - 8);
-                    ctx.lineTo(5, -this.radius - 2);
-                    ctx.lineTo(0, -this.radius - 12);
-                    ctx.fill();
-                } else if (this.maskType === 'horn') {
-                    ctx.fillStyle = '#eab308';
-                    ctx.beginPath();
-                    ctx.moveTo(2, -this.radius);
-                    ctx.lineTo(15, -this.radius - 10);
-                    ctx.lineTo(-2, -this.radius - 2);
-                    ctx.fill();
-                }
 
                 ctx.restore();
             }
 
             die() {
+                if (this.isDead) return;
                 this.isDead = true;
-                for (let i = 0; i < this.segments.length; i += 3) {
+                // দেহ খাবারে পরিণত হওয়া
+                for (let i = 0; i < this.segments.length; i += 2) {
                     const seg = this.segments[i];
-                    foods.push(new Food(seg.x + (Math.random() - 0.5) * 20, seg.y + (Math.random() - 0.5) * 20));
+                    foods.push(new Food(seg.x + (Math.random() - 0.5) * 15, seg.y + (Math.random() - 0.5) * 15, 8));
                 }
             }
         }
@@ -672,14 +441,23 @@
         const bots = [];
         const foods = [];
         const coins = [];
+        const BOT_NAMES = ['Cobra', 'Viper', 'Titan', 'Apex', 'Slayer', 'Python', 'Shadow'];
+        const BOT_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+
+        function spawnBot(id) {
+            const x = Math.random() * (MAP_SIZE - 600) + 300;
+            const y = Math.random() * (MAP_SIZE - 600) + 300;
+            const name = BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
+            const color = BOT_COLORS[Math.floor(Math.random() * BOT_COLORS.length)];
+            return new Worm(id, name, x, y, color, 'none', true);
+        }
 
         function startGame() {
-            const pName = document.getElementById('playerName').value || 'Player';
-            playerWorm = new Worm(0, pName, MAP_SIZE / 2, MAP_SIZE / 2, selectedSkin.color, selectedMask.id, false);
-
+            const name = document.getElementById('playerName').value || 'Player';
+            playerWorm = new Worm(0, name, MAP_SIZE / 2, MAP_SIZE / 2, selectedSkin.color, selectedMask.id, false);
             document.getElementById('lobby').style.display = 'none';
 
-            for (let i = 0; i < 22; i++) spawnBot();
+            for (let i = 1; i <= 18; i++) bots.push(spawnBot(i));
             for (let i = 0; i < MAX_FOOD_COUNT; i++) foods.push(new Food());
             for (let i = 0; i < MAX_COIN_COUNT; i++) coins.push(new Coin());
 
@@ -687,159 +465,117 @@
             animate();
         }
 
-        const BOT_NAMES = ['Viper', 'Shadow', 'Titan', 'Apex', 'Cobra', 'Blaze', 'Slayer'];
-        const BOT_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
-        const BOT_MASKS = ['none', 'pig', 'ninja', 'crown', 'horn'];
-        let botCounter = 1;
-
-        function spawnBot() {
-            const x = Math.random() * (MAP_SIZE - 600) + 300;
-            const y = Math.random() * (MAP_SIZE - 600) + 300;
-            const color = BOT_COLORS[Math.floor(Math.random() * BOT_COLORS.length)];
-            const mask = BOT_MASKS[Math.floor(Math.random() * BOT_MASKS.length)];
-            const name = BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
-            bots.push(new Worm(botCounter++, name, x, y, color, mask, true));
-        }
-
-        function triggerGameOver(reason) {
-            isGameOver = true;
-            document.getElementById('deathReason').innerText = reason;
-            document.getElementById('finalScore').innerText = playerWorm.score;
-            document.getElementById('game-over').style.display = 'block';
-            localStorage.setItem('wz_coins_v2', totalCoins);
-        }
-
         function updateLeaderboard() {
-            const allWorms = [playerWorm, ...bots.filter(b => !b.isDead)];
-            allWorms.sort((a, b) => b.score - a.score);
+            const all = [playerWorm, ...bots.filter(b => !b.isDead)];
+            all.sort((a, b) => b.score - a.score);
 
-            const lbContainer = document.getElementById('lb-list');
-            lbContainer.innerHTML = '';
-            allWorms.slice(0, 5).forEach((w, index) => {
+            const lbList = document.getElementById('lb-list');
+            lbList.innerHTML = '';
+            all.slice(0, 5).forEach((w, idx) => {
                 const item = document.createElement('div');
                 item.className = 'lb-item' + (w === playerWorm ? ' player' : '');
-                item.innerHTML = `<span>${index + 1}. ${w.name}</span> <span>${Math.floor(w.score)}</span>`;
-                lbContainer.appendChild(item);
+                item.innerHTML = `<span>${idx + 1}. ${w.name}</span> <span>${Math.floor(w.score)}</span>`;
+                lbList.appendChild(item);
             });
         }
 
         function animate() {
-            if (isGameOver) return;
+            if (playerWorm.isDead) {
+                document.getElementById('deathReason').innerText = "You crashed and turned into food!";
+                document.getElementById('finalScore').innerText = playerWorm.score;
+                document.getElementById('game-over').style.display = 'block';
+                localStorage.setItem('wz_coins_v4', totalCoins);
+                return;
+            }
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const camX = playerWorm.x - canvas.width / 2;
+            const camY = playerWorm.y - canvas.height / 2;
 
-            const cameraX = playerWorm.x - canvas.width / 2;
-            const cameraY = playerWorm.y - canvas.height / 2;
+            // Border
+            ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 10;
+            ctx.strokeRect(40 - camX, 40 - camY, MAP_SIZE - 80, MAP_SIZE - 80);
 
-            // ব্যাকগ্রাউন্ড গ্রিড
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-            ctx.lineWidth = 1;
-            const startX = Math.floor(cameraX / 60) * 60;
-            const startY = Math.floor(cameraY / 60) * 60;
-
-            for (let x = startX; x < startX + canvas.width + 60; x += 60) {
-                ctx.beginPath();
-                ctx.moveTo(x - cameraX, 0);
-                ctx.lineTo(x - cameraX, canvas.height);
-                ctx.stroke();
-            }
-            for (let y = startY; y < startY + canvas.height + 60; y += 60) {
-                ctx.beginPath();
-                ctx.moveTo(0, y - cameraY);
-                ctx.lineTo(canvas.width, y - cameraY);
-                ctx.stroke();
-            }
-
-            // ❌ লাল সীমানা (Border)
-            ctx.strokeStyle = '#ef4444';
-            ctx.lineWidth = 12;
-            ctx.strokeRect(-cameraX + 50, -cameraY + 50, MAP_SIZE - 100, MAP_SIZE - 100);
-
-            // কয়েন সংগ্রহ
-            coins.forEach((coin, index) => {
-                coin.draw(cameraX, cameraY);
-                const dist = Math.hypot(playerWorm.x - coin.x, playerWorm.y - coin.y);
-                if (dist < playerWorm.radius + coin.radius) {
-                    coins.splice(index, 1);
+            // Coins
+            coins.forEach((c, idx) => {
+                c.draw(camX, camY);
+                if (Math.hypot(playerWorm.x - c.x, playerWorm.y - c.y) < playerWorm.radius + c.radius) {
+                    coins.splice(idx, 1);
                     totalCoins++;
                     document.getElementById('gameCoinVal').innerText = totalCoins;
-                    if (coins.length < MAX_COIN_COUNT) coins.push(new Coin());
+                    coins.push(new Coin());
                 }
             });
 
-            // খাবার ও আস্তে আস্তে বৃদ্ধি পাওয়া
-            foods.forEach((food, index) => {
-                food.draw(cameraX, cameraY);
+            // Food Collection (Player & Bots)
+            foods.forEach((f, idx) => {
+                f.draw(camX, camY);
 
-                const distPlayer = Math.hypot(playerWorm.x - food.x, playerWorm.y - food.y);
-                if (distPlayer < playerWorm.radius + food.type.radius) {
-                    foods.splice(index, 1);
-                    playerWorm.length += 0.2; // ধীর বৃদ্ধি
-                    playerWorm.score += food.type.score;
+                if (Math.hypot(playerWorm.x - f.x, playerWorm.y - f.y) < playerWorm.radius + f.radius) {
+                    foods.splice(idx, 1);
+                    playerWorm.length += 0.15;
+                    playerWorm.score += f.value;
                     document.getElementById('scoreVal').innerText = playerWorm.score;
                     if (foods.length < MAX_FOOD_COUNT) foods.push(new Food());
                 }
 
                 bots.forEach(bot => {
-                    if (bot.isDead) return;
-                    const distBot = Math.hypot(bot.x - food.x, bot.y - food.y);
-                    if (distBot < bot.radius + food.type.radius) {
-                        foods.splice(index, 1);
-                        bot.length += 0.2;
-                        bot.score += food.type.score;
+                    if (!bot.isDead && Math.hypot(bot.x - f.x, bot.y - f.y) < bot.radius + f.radius) {
+                        foods.splice(idx, 1);
+                        bot.length += 0.15;
+                        bot.score += f.value;
                         if (foods.length < MAX_FOOD_COUNT) foods.push(new Food());
                     }
                 });
             });
 
-            // প্লেয়ার আপডেট
-            playerWorm.update(mouseWorld.x, mouseWorld.y, isMouseDown);
-            if (playerWorm.isDead) {
-                triggerGameOver("You hit the red border wall!");
-                return;
-            }
-            playerWorm.draw(cameraX, cameraY);
+            // Player Update
+            playerWorm.update(moveAngle, isBoosting);
+            playerWorm.draw(camX, camY);
 
             const activeWorms = [playerWorm, ...bots.filter(b => !b.isDead)];
 
-            // বট আপডেট ও সংঘাত
-            bots.forEach((bot, bIndex) => {
+            // Smart Bots Logic & Collision
+            bots.forEach((bot, bIdx) => {
                 if (bot.isDead) return;
 
-                if (Math.random() < 0.03) {
-                    bot.targetX = bot.x + (Math.random() - 0.5) * 800;
-                    bot.targetY = bot.y + (Math.random() - 0.5) * 800;
+                // AI Steering towards food
+                let nearestFood = null;
+                let minDist = 250;
+                foods.forEach(f => {
+                    const d = Math.hypot(bot.x - f.x, bot.y - f.y);
+                    if (d < minDist) { minDist = d; nearestFood = f; }
+                });
+
+                if (nearestFood) {
+                    bot.angle = Math.atan2(nearestFood.y - bot.y, nearestFood.x - bot.x);
+                } else if (Math.random() < 0.03) {
+                    bot.angle += (Math.random() - 0.5);
                 }
 
-                bot.update(bot.targetX || bot.x, bot.targetY || bot.y, false);
-                if (bot.isDead) {
-                    bots.splice(bIndex, 1);
-                    setTimeout(spawnBot, 2500);
-                    return;
-                }
-                bot.draw(cameraX, cameraY);
+                bot.update(bot.angle, false);
+                bot.draw(camX, camY);
 
-                // বট অন্যের গায়ে লাগলে মৃত্যু
-                activeWorms.forEach(otherWorm => {
-                    if (otherWorm === bot || otherWorm.isDead) return;
-                    for (let i = 5; i < otherWorm.segments.length; i += 2) {
-                        const seg = otherWorm.segments[i];
-                        const dist = Math.hypot(bot.x - seg.x, bot.y - seg.y);
-                        if (dist < bot.radius + otherWorm.radius - 4) {
+                // 💥 বটের শরীর স্পর্শ করলে অন্য বটের মৃত্যু
+                activeWorms.forEach(other => {
+                    if (other === bot || other.isDead) return;
+                    for (let i = 4; i < other.segments.length; i += 2) {
+                        const seg = other.segments[i];
+                        if (Math.hypot(bot.x - seg.x, bot.y - seg.y) < bot.radius + other.radius - 3) {
                             bot.die();
-                            setTimeout(spawnBot, 2500);
+                            setTimeout(() => { bots[bIdx] = spawnBot(bot.id); }, 3000);
                             break;
                         }
                     }
                 });
 
-                // প্লেয়ার বটের গায়ে লাগলে মৃত্যু
-                for (let i = 5; i < bot.segments.length; i += 2) {
-                    const seg = bot.segments[i];
-                    const dist = Math.hypot(playerWorm.x - seg.x, playerWorm.y - seg.y);
-                    if (dist < playerWorm.radius + bot.radius - 4) {
-                        playerWorm.die();
-                        triggerGameOver("You crashed into another worm!");
+                // 💥 প্লেয়ারের মুখ অন্য সাপের গায়ে লাগলে প্লেয়ারের মৃত্যু
+                if (!bot.isDead) {
+                    for (let i = 4; i < bot.segments.length; i += 2) {
+                        const seg = bot.segments[i];
+                        if (Math.hypot(playerWorm.x - seg.x, playerWorm.y - seg.y) < playerWorm.radius + bot.radius - 3) {
+                            playerWorm.die();
+                        }
                     }
                 }
             });
