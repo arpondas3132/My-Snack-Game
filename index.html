@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Worms Zone Ultimate Master Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            overflow: hidden;
+            background-color: #0f172a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+        }
+
+        #gameCanvas {
+            display: block;
+        }
+
+        /* ----- LOBBY SCREEN ----- */
+        #lobby {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, #1e293b, #0f172a);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .lobby-title {
+            font-size: 38px;
+            font-weight: 800;
+            color: #facc15;
+            text-shadow: 0 0 20px rgba(250, 204, 21, 0.5);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .lobby-box {
+            background: rgba(30, 41, 59, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .input-group label {
+            font-size: 13px;
+            color: #94a3b8;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .coins-display {
+            font-size: 18px;
+            color: #facc15;
+            font-weight: bold;
+            text-align: center;
+            background: rgba(250, 204, 21, 0.1);
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px solid rgba(250, 204, 21, 0.3);
+        }
+
+        /* Tabs for Shops */
+        .shop-tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 5px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 5px 10px;
+            font-size: 13px;
+        }
+
+        .tab-btn.active {
+            color: #facc15;
+            border-bottom: 2px solid #facc15;
+        }
+
+        /* Skin/Item Selector Grid */
+        .item-selector {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 5px 0;
+        }
+
+        .item-card {
+            min-width: 90px;
+            padding: 10px;
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .item-card.selected {
+            border-color: #facc15;
+            background: rgba(250, 204, 21, 0.1);
+        }
+
+        .skin-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin: 0 auto 5px;
+        }
+
+        .item-price {
+            font-size: 11px;
+            color: #facc15;
+            margin-top: 2px;
+        }
+
+        /* Chat Section */
+        .chat-box {
+            height: 70px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 8px;
+            overflow-y: auto;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 6px;
+        }
+
+        .chat-input-container input {
+            flex: 1;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .chat-input-container button {
+            padding: 6px 12px;
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .btn-start {
+            padding: 12px;
+            background: #22c55e;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 5px 15px rgba(34, 197, 94, 0.4);
+            margin-top: 5px;
+        }
+
+        .btn-start:hover { background: #16a34a; }
+
+        /* ----- IN-GAME UI ----- */
+        #ui-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            pointer-events: none;
+        }
+
+        .score-box { font-size: 20px; font-weight: bold; color: #4ade80; }
+        .coin-box { font-size: 15px; color: #facc15; font-weight: bold; margin-top: 2px; }
+
+        #leaderboard {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 180px;
+        }
+
+        #leaderboard h3 { font-size: 13px; color: #facc15; margin-bottom: 6px; }
+        .lb-item { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; }
+        .lb-item.player { color: #4ade80; font-weight: bold; }
+
+        #game-over {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            background: rgba(15, 23, 42, 0.95);
+            padding: 30px 50px;
+            border-radius: 20px;
+            border: 2px solid #ef4444;
+            text-align: center;
+        }
+
+        #restart-btn {
+            margin-top: 15px;
+            padding: 10px 25px;
+            font-size: 16px;
+            background: #22c55e;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 🚪 WAITING LOBBY -->
+    <div id="lobby">
+        <div class="lobby-title">🐍 Worms Zone</div>
+        <div class="lobby-box">
+            <div class="coins-display">🪙 Total Coins: <span id="lobbyCoinCount">0</span></div>
+            
+            <div class="input-group">
+                <label>Player Name:</label>
+                <input type="text" id="playerName" value="Player1" maxlength="12">
+            </div>
+
+            <!-- Shop Tabs -->
+            <div class="shop-tabs">
+                <button class="tab-btn active" onclick="switchTab('skins')">Skins</button>
+                <button class="tab-btn" onclick="switchTab('masks')">Nose / Masks</button>
+            </div>
+
+            <!-- Skin / Mask Grid -->
+            <div class="item-selector" id="shopContainer"></div>
+
+            <!-- Lobby Chat -->
+            <div class="input-group">
+                <label>Global Chat:</label>
+                <div class="chat-box" id="chatBox">
+                    <div><b style="color:#38bdf8;">System:</b> Welcome! Customise your snake snout/mask and play!</div>
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" id="chatInput" placeholder="Type a message...">
+                    <button onclick="sendChatMessage()">Send</button>
+                </div>
+            </div>
+
+            <button class="btn-start" onclick="startGame()">START GAME</button>
+        </div>
+    </div>
+
+    <!-- 🎮 IN-GAME HUD -->
+    <div id="ui-overlay">
+        <div class="score-box">Score: <span id="scoreVal">0</span></div>
+        <div class="coin-box">🪙 Coins: <span id="gameCoinVal">0</span></div>
+        <div style="font-size:11px; color:#94a3b8; margin-top:3px;">Left Click / Tap to Boost</div>
+    </div>
+
+    <div id="leaderboard">
+        <h3>🏆 Top Worms</h3>
+        <div id="lb-list"></div>
+    </div>
+
+    <div id="game-over">
+        <h2 style="color:#ef4444;">💥 Game Over!</h2>
+        <p id="deathReason" style="font-size: 14px; color: #cbd5e1; margin-top: 5px;"></p>
+        <p style="margin-top: 10px;">Final Score: <span id="finalScore">0</span></p>
+        <button id="restart-btn" onclick="location.reload()">Back to Lobby</button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const MAP_SIZE = 3500;
+        const MAX_FOOD_COUNT = 300;
+        const MAX_COIN_COUNT = 35;
+
+        // কয়েন ডাটা
+        let totalCoins = parseInt(localStorage.getItem('wz_coins_v2')) || 0;
+        document.getElementById('lobbyCoinCount').innerText = totalCoins;
+
+        // সাপের স্কিন
+        const SKINS = [
+            { id: 'red', name: 'Ruby', color: '#e11d48', price: 0, unlocked: true },
+            { id: 'blue', name: 'Cyan', color: '#06b6d4', price: 40, unlocked: false },
+            { id: 'green', name: 'Emerald', color: '#10b981', price: 80, unlocked: false },
+            { id: 'purple', name: 'Royal', color: '#8b5cf6', price: 120, unlocked: false },
+            { id: 'gold', name: 'Gold', color: '#facc15', price: 200, unlocked: false }
+        ];
+
+        // সাপের নাক/মুখোশ (Masks / Snouts)
+        const MASKS = [
+            { id: 'none', name: 'Normal', price: 0, unlocked: true, type: 'none' },
+            { id: 'pig', name: 'Pig Nose 🐷', price: 30, unlocked: false, type: 'pig' },
+            { id: 'ninja', name: 'Ninja Mask 🥷', price: 60, unlocked: false, type: 'ninja' },
+            { id: 'crown', name: 'Crown 👑', price: 100, unlocked: false, type: 'crown' },
+            { id: 'horn', name: 'Gold Horn 🦄', price: 150, unlocked: false, type: 'horn' }
+        ];
+
+        let selectedSkin = SKINS[0];
+        let selectedMask = MASKS[0];
+        let currentTab = 'skins';
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            if(tab === 'skins') document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            else document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            renderShop();
+        }
+
+        function renderShop() {
+            const container = document.getElementById('shopContainer');
+            container.innerHTML = '';
+
+            const list = currentTab === 'skins' ? SKINS : MASKS;
+
+            list.forEach(item => {
+                const isSelected = (currentTab === 'skins' && item.id === selectedSkin.id) || 
+                                   (currentTab === 'masks' && item.id === selectedMask.id);
+
+                const card = document.createElement('div');
+                card.className = `item-card ${isSelected ? 'selected' : ''}`;
+                
+                let previewHTML = '';
+                if(currentTab === 'skins') {
+                    previewHTML = `<div class="skin-preview" style="background: ${item.color}"></div>`;
+                } else {
+                    previewHTML = `<div style="font-size:22px; margin-bottom:2px;">${item.name.split(' ')[1] || '🐍'}</div>`;
+                }
+
+                card.innerHTML = `
+                    ${previewHTML}
+                    <div style="font-weight:bold; font-size:12px;">${item.name.split(' ')[0]}</div>
+                    <div class="item-price">${item.unlocked ? 'Owned' : '🪙 ' + item.price}</div>
+                `;
+                card.onclick = () => selectOrBuyItem(item, currentTab);
+                container.appendChild(card);
+            });
+        }
+
+        function selectOrBuyItem(item, type) {
+            if (item.unlocked) {
+                if (type === 'skins') selectedSkin = item;
+                else selectedMask = item;
+            } else if (totalCoins >= item.price) {
+                totalCoins -= item.price;
+                item.unlocked = true;
+                if (type === 'skins') selectedSkin = item;
+                else selectedMask = item;
+                localStorage.setItem('wz_coins_v2', totalCoins);
+                document.getElementById('lobbyCoinCount').innerText = totalCoins;
+            } else {
+                alert('আপনার কাছে যথেষ্ট কয়েন নেই!');
+            }
+            renderShop();
+        }
+
+        renderShop();
+
+        // লবি চ্যাট
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            const pName = document.getElementById('playerName').value || 'Player';
+            if (text) {
+                const chatBox = document.getElementById('chatBox');
+                const msg = document.createElement('div');
+                msg.innerHTML = `<b style="color:#4ade80;">${pName}:</b> ${text}`;
+                chatBox.appendChild(msg);
+                chatBox.scrollTop = chatBox.scrollHeight;
+                input.value = '';
+            }
+        }
+
+        let mouseWorld = { x: MAP_SIZE / 2, y: MAP_SIZE / 2 };
+        let isMouseDown = false;
+        let isGameOver = false;
+
+        window.addEventListener('mousemove', (e) => {
+            if (!playerWorm) return;
+            const cameraX = playerWorm.x - canvas.width / 2;
+            const cameraY = playerWorm.y - canvas.height / 2;
+            mouseWorld.x = e.clientX + cameraX;
+            mouseWorld.y = e.clientY + cameraY;
+        });
+
+        // 🖱️ মাউসের বাম বাটন চেপে ধরলে স্পিড বাড়বে
+        window.addEventListener('mousedown', (e) => { if (e.button === 0) isMouseDown = true; });
+        window.addEventListener('mouseup', (e) => { if (e.button === 0) isMouseDown = false; });
+
+        // মোবাইল টাচ কন্ট্রোল
+        window.addEventListener('touchstart', () => { isMouseDown = true; });
+        window.addEventListener('touchend', () => { isMouseDown = false; });
+        window.addEventListener('touchmove', (e) => {
+            if (!playerWorm || !e.touches[0]) return;
+            const cameraX = playerWorm.x - canvas.width / 2;
+            const cameraY = playerWorm.y - canvas.height / 2;
+            mouseWorld.x = e.touches[0].clientX + cameraX;
+            mouseWorld.y = e.touches[0].clientY + cameraY;
+        });
+
+        const FRUIT_TYPES = [
+            { name: 'Apple', color: '#ef4444', radius: 8, score: 5 },
+            { name: 'Orange', color: '#f97316', radius: 9, score: 7 },
+            { name: 'Grape', color: '#a855f7', radius: 7, score: 4 }
+        ];
+
+        class Food {
+            constructor(x, y) {
+                this.x = x || Math.random() * (MAP_SIZE - 400) + 200;
+                this.y = y || Math.random() * (MAP_SIZE - 400) + 200;
+                this.type = FRUIT_TYPES[Math.floor(Math.random() * FRUIT_TYPES.length)];
+            }
+
+            draw(cameraX, cameraY) {
+                const screenX = this.x - cameraX;
+                const screenY = this.y - cameraY;
+                if (screenX < -20 || screenX > canvas.width + 20 || screenY < -20 || screenY > canvas.height + 20) return;
+
+                ctx.beginPath();
+                ctx.arc(screenX, screenY, this.type.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.type.color;
+                ctx.fill();
+            }
+        }
+
+        class Coin {
+            constructor() {
+                this.x = Math.random() * (MAP_SIZE - 400) + 200;
+                this.y = Math.random() * (MAP_SIZE - 400) + 200;
+                this.radius = 8;
+            }
+
+            draw(cameraX, cameraY) {
+                const screenX = this.x - cameraX;
+                const screenY = this.y - cameraY;
+                if (screenX < -20 || screenX > canvas.width + 20 || screenY < -20 || screenY > canvas.height + 20) return;
+
+                ctx.beginPath();
+                ctx.arc(screenX, screenY, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#facc15';
+                ctx.fill();
+                ctx.strokeStyle = '#ca8a04';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+
+        class Segment {
+            constructor(x, y) { this.x = x; this.y = y; }
+        }
+
+        class Worm {
+            constructor(id, name, x, y, color, maskType = 'none', isBot = false) {
+                this.id = id;
+                this.name = name;
+                this.x = x;
+                this.y = y;
+                this.radius = 12; // প্রাথমিক সাইজ
+                this.color = color;
+                this.maskType = maskType;
+                this.isBot = isBot;
+                this.baseSpeed = 3.0;
+                this.speed = this.baseSpeed;
+                this.segments = [];
+                this.length = 20; // প্রাথমিক দৈর্ঘ্য
+                this.angle = Math.random() * Math.PI * 2;
+                this.score = 0;
+                this.isDead = false;
+                this.tongueTimer = 0;
+
+                for (let i = 0; i < this.length; i++) {
+                    this.segments.push(new Segment(this.x, this.y));
+                }
+            }
+
+            update(targetX, targetY, isBoosting) {
+                if (this.isDead) return;
+
+                // স্পিড পরিবর্তন
+                this.speed = isBoosting ? this.baseSpeed * 1.8 : this.baseSpeed;
+
+                const dx = targetX - this.x;
+                const dy = targetY - this.y;
+                const targetAngle = Math.atan2(dy, dx);
+
+                let diff = targetAngle - this.angle;
+                while (diff < -Math.PI) diff += Math.PI * 2;
+                while (diff > Math.PI) diff -= Math.PI * 2;
+                this.angle += diff * 0.1;
+
+                this.x += Math.cos(this.angle) * this.speed;
+                this.y += Math.sin(this.angle) * this.speed;
+
+                // 🛑 লাল সীমানা ধাক্কায় মৃত্যু
+                if (this.x <= 50 || this.x >= MAP_SIZE - 50 || this.y <= 50 || this.y >= MAP_SIZE - 50) {
+                    this.die();
+                    return;
+                }
+
+                this.segments.unshift(new Segment(this.x, this.y));
+                while (this.segments.length > this.length) {
+                    this.segments.pop();
+                }
+
+                // 📈 খুব আস্তে আস্তে মোটা হওয়া (Slow Growth Math)
+                this.radius = 12 + Math.min(25, this.score / 250); 
+                this.tongueTimer += 0.1;
+            }
+
+            draw(cameraX, cameraY) {
+                if (this.isDead) return;
+
+                // শরীরের অংশ আঁকা
+                for (let i = this.segments.length - 1; i >= 1; i -= 2) {
+                    const seg = this.segments[i];
+                    const screenX = seg.x - cameraX;
+                    const screenY = seg.y - cameraY;
+                    if (screenX < -50 || screenX > canvas.width + 50 || screenY < -50 || screenY > canvas.height + 50) continue;
+
+                    ctx.beginPath();
+                    ctx.arc(screenX, screenY, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+
+                // 🐍 মাথা, চোখ ও মুখ আঁকা (Head Details)
+                const headX = this.x - cameraX;
+                const headY = this.y - cameraY;
+
+                ctx.save();
+                ctx.translate(headX, headY);
+                ctx.rotate(this.angle);
+
+                // মাথা (Head Circle)
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius + 1, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                // 👅 লাল জিব (Tongue)
+                const tongueLen = 8 + Math.sin(this.tongueTimer) * 4;
+                ctx.beginPath();
+                ctx.moveTo(this.radius, -2);
+                ctx.lineTo(this.radius + tongueLen, -2);
+                ctx.lineTo(this.radius + tongueLen + 3, -5);
+                ctx.moveTo(this.radius + tongueLen, -2);
+                ctx.lineTo(this.radius + tongueLen + 3, 1);
+                ctx.strokeStyle = '#ef4444';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // 👀 দুটি চোখ (Eyes)
+                const eyeOffset = this.radius * 0.5;
+                ctx.beginPath();
+                ctx.arc(this.radius * 0.3, -eyeOffset, 4, 0, Math.PI * 2);
+                ctx.arc(this.radius * 0.3, eyeOffset, 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+
+                // চোখের মনি (Pupils)
+                ctx.beginPath();
+                ctx.arc(this.radius * 0.4, -eyeOffset, 2, 0, Math.PI * 2);
+                ctx.arc(this.radius * 0.4, eyeOffset, 2, 0, Math.PI * 2);
+                ctx.fillStyle = '#000000';
+                ctx.fill();
+
+                // 👺 কাস্টম নাক / মাস্ক (Custom Mask/Nose Overlay)
+                if (this.maskType === 'pig') {
+                    ctx.beginPath();
+                    ctx.arc(this.radius + 2, 0, 5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#f472b6';
+                    ctx.fill();
+                } else if (this.maskType === 'ninja') {
+                    ctx.fillStyle = '#0f172a';
+                    ctx.fillRect(-2, -eyeOffset - 3, 10, (eyeOffset * 2) + 6);
+                } else if (this.maskType === 'crown') {
+                    ctx.fillStyle = '#facc15';
+                    ctx.beginPath();
+                    ctx.moveTo(-5, -this.radius - 8);
+                    ctx.lineTo(5, -this.radius - 2);
+                    ctx.lineTo(0, -this.radius - 12);
+                    ctx.fill();
+                } else if (this.maskType === 'horn') {
+                    ctx.fillStyle = '#eab308';
+                    ctx.beginPath();
+                    ctx.moveTo(2, -this.radius);
+                    ctx.lineTo(15, -this.radius - 10);
+                    ctx.lineTo(-2, -this.radius - 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+
+            die() {
+                this.isDead = true;
+                for (let i = 0; i < this.segments.length; i += 3) {
+                    const seg = this.segments[i];
+                    foods.push(new Food(seg.x + (Math.random() - 0.5) * 20, seg.y + (Math.random() - 0.5) * 20));
+                }
+            }
+        }
+
+        let playerWorm;
+        const bots = [];
+        const foods = [];
+        const coins = [];
+
+        function startGame() {
+            const pName = document.getElementById('playerName').value || 'Player';
+            playerWorm = new Worm(0, pName, MAP_SIZE / 2, MAP_SIZE / 2, selectedSkin.color, selectedMask.id, false);
+
+            document.getElementById('lobby').style.display = 'none';
+
+            for (let i = 0; i < 22; i++) spawnBot();
+            for (let i = 0; i < MAX_FOOD_COUNT; i++) foods.push(new Food());
+            for (let i = 0; i < MAX_COIN_COUNT; i++) coins.push(new Coin());
+
+            document.getElementById('gameCoinVal').innerText = totalCoins;
+            animate();
+        }
+
+        const BOT_NAMES = ['Viper', 'Shadow', 'Titan', 'Apex', 'Cobra', 'Blaze', 'Slayer'];
+        const BOT_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+        const BOT_MASKS = ['none', 'pig', 'ninja', 'crown', 'horn'];
+        let botCounter = 1;
+
+        function spawnBot() {
+            const x = Math.random() * (MAP_SIZE - 600) + 300;
+            const y = Math.random() * (MAP_SIZE - 600) + 300;
+            const color = BOT_COLORS[Math.floor(Math.random() * BOT_COLORS.length)];
+            const mask = BOT_MASKS[Math.floor(Math.random() * BOT_MASKS.length)];
+            const name = BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
+            bots.push(new Worm(botCounter++, name, x, y, color, mask, true));
+        }
+
+        function triggerGameOver(reason) {
+            isGameOver = true;
+            document.getElementById('deathReason').innerText = reason;
+            document.getElementById('finalScore').innerText = playerWorm.score;
+            document.getElementById('game-over').style.display = 'block';
+            localStorage.setItem('wz_coins_v2', totalCoins);
+        }
+
+        function updateLeaderboard() {
+            const allWorms = [playerWorm, ...bots.filter(b => !b.isDead)];
+            allWorms.sort((a, b) => b.score - a.score);
+
+            const lbContainer = document.getElementById('lb-list');
+            lbContainer.innerHTML = '';
+            allWorms.slice(0, 5).forEach((w, index) => {
+                const item = document.createElement('div');
+                item.className = 'lb-item' + (w === playerWorm ? ' player' : '');
+                item.innerHTML = `<span>${index + 1}. ${w.name}</span> <span>${Math.floor(w.score)}</span>`;
+                lbContainer.appendChild(item);
+            });
+        }
+
+        function animate() {
+            if (isGameOver) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const cameraX = playerWorm.x - canvas.width / 2;
+            const cameraY = playerWorm.y - canvas.height / 2;
+
+            // ব্যাকগ্রাউন্ড গ্রিড
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            const startX = Math.floor(cameraX / 60) * 60;
+            const startY = Math.floor(cameraY / 60) * 60;
+
+            for (let x = startX; x < startX + canvas.width + 60; x += 60) {
+                ctx.beginPath();
+                ctx.moveTo(x - cameraX, 0);
+                ctx.lineTo(x - cameraX, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = startY; y < startY + canvas.height + 60; y += 60) {
+                ctx.beginPath();
+                ctx.moveTo(0, y - cameraY);
+                ctx.lineTo(canvas.width, y - cameraY);
+                ctx.stroke();
+            }
+
+            // ❌ লাল সীমানা (Border)
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 12;
+            ctx.strokeRect(-cameraX + 50, -cameraY + 50, MAP_SIZE - 100, MAP_SIZE - 100);
+
+            // কয়েন সংগ্রহ
+            coins.forEach((coin, index) => {
+                coin.draw(cameraX, cameraY);
+                const dist = Math.hypot(playerWorm.x - coin.x, playerWorm.y - coin.y);
+                if (dist < playerWorm.radius + coin.radius) {
+                    coins.splice(index, 1);
+                    totalCoins++;
+                    document.getElementById('gameCoinVal').innerText = totalCoins;
+                    if (coins.length < MAX_COIN_COUNT) coins.push(new Coin());
+                }
+            });
+
+            // খাবার ও আস্তে আস্তে বৃদ্ধি পাওয়া
+            foods.forEach((food, index) => {
+                food.draw(cameraX, cameraY);
+
+                const distPlayer = Math.hypot(playerWorm.x - food.x, playerWorm.y - food.y);
+                if (distPlayer < playerWorm.radius + food.type.radius) {
+                    foods.splice(index, 1);
+                    playerWorm.length += 0.2; // ধীর বৃদ্ধি
+                    playerWorm.score += food.type.score;
+                    document.getElementById('scoreVal').innerText = playerWorm.score;
+                    if (foods.length < MAX_FOOD_COUNT) foods.push(new Food());
+                }
+
+                bots.forEach(bot => {
+                    if (bot.isDead) return;
+                    const distBot = Math.hypot(bot.x - food.x, bot.y - food.y);
+                    if (distBot < bot.radius + food.type.radius) {
+                        foods.splice(index, 1);
+                        bot.length += 0.2;
+                        bot.score += food.type.score;
+                        if (foods.length < MAX_FOOD_COUNT) foods.push(new Food());
+                    }
+                });
+            });
+
+            // প্লেয়ার আপডেট
+            playerWorm.update(mouseWorld.x, mouseWorld.y, isMouseDown);
+            if (playerWorm.isDead) {
+                triggerGameOver("You hit the red border wall!");
+                return;
+            }
+            playerWorm.draw(cameraX, cameraY);
+
+            const activeWorms = [playerWorm, ...bots.filter(b => !b.isDead)];
+
+            // বট আপডেট ও সংঘাত
+            bots.forEach((bot, bIndex) => {
+                if (bot.isDead) return;
+
+                if (Math.random() < 0.03) {
+                    bot.targetX = bot.x + (Math.random() - 0.5) * 800;
+                    bot.targetY = bot.y + (Math.random() - 0.5) * 800;
+                }
+
+                bot.update(bot.targetX || bot.x, bot.targetY || bot.y, false);
+                if (bot.isDead) {
+                    bots.splice(bIndex, 1);
+                    setTimeout(spawnBot, 2500);
+                    return;
+                }
+                bot.draw(cameraX, cameraY);
+
+                // বট অন্যের গায়ে লাগলে মৃত্যু
+                activeWorms.forEach(otherWorm => {
+                    if (otherWorm === bot || otherWorm.isDead) return;
+                    for (let i = 5; i < otherWorm.segments.length; i += 2) {
+                        const seg = otherWorm.segments[i];
+                        const dist = Math.hypot(bot.x - seg.x, bot.y - seg.y);
+                        if (dist < bot.radius + otherWorm.radius - 4) {
+                            bot.die();
+                            setTimeout(spawnBot, 2500);
+                            break;
+                        }
+                    }
+                });
+
+                // প্লেয়ার বটের গায়ে লাগলে মৃত্যু
+                for (let i = 5; i < bot.segments.length; i += 2) {
+                    const seg = bot.segments[i];
+                    const dist = Math.hypot(playerWorm.x - seg.x, playerWorm.y - seg.y);
+                    if (dist < playerWorm.radius + bot.radius - 4) {
+                        playerWorm.die();
+                        triggerGameOver("You crashed into another worm!");
+                    }
+                }
+            });
+
+            updateLeaderboard();
+            requestAnimationFrame(animate);
+        }
+    </script>
+</body>
+</html>
